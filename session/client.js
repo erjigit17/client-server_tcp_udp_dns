@@ -1,8 +1,10 @@
 'use strict';
 
+const Session = require('./session.js');
+
 const UNIX_EPOCH = 'Thu, 01 Jan 1970 00:00:00 GMT';
 const COOKIE_EXPIRE = 'Fri, 01 Jan 2100 00:00:00 GMT';
-const COOKIE_DELETE = `=delete; Expires=${UNIX_EPOCH}; Path=/; Domain=`;
+const COOKIE_DELETE = `=deleted; Expires=${UNIX_EPOCH}; Path=/; Domain=`;
 
 const parseHost = host => {
   if (!host) return 'no-host-name-in-http-headers';
@@ -28,16 +30,16 @@ class Client {
     await Session.restore(client);
     return client;
   }
-  
+
   parseCookie() {
     const { req } = this;
     const { cookie } = req.headers;
     if (!cookie) return;
-    const item = cookie.split(';');
+    const items = cookie.split(';');
     for (const item of items) {
-      const part = item.split('=');
-      const key = part[0].trim();
-      const val = part[1] || '';
+      const parts = item.split('=');
+      const key = parts[0].trim();
+      const val = parts[1] || '';
       this.cookie[key] = val.trim();
     }
   }
@@ -55,9 +57,9 @@ class Client {
   }
 
   sendCookie() {
-    const { res,  preparedCookie } = this;
-    if (preparedCookie.length && res.headersSent) {
-      console.dir({ preparedCookie })
+    const { res, preparedCookie } = this;
+    if (preparedCookie.length && !res.headersSent) {
+      console.dir({ preparedCookie });
       res.setHeader('Set-Cookie', preparedCookie);
     }
   }

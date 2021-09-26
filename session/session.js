@@ -1,5 +1,7 @@
 'use strict';
 
+const storage = require('./storage.js');
+
 const TOKEN_LENGTH = 32;
 const ALPHA_UPPER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const ALPHA_LOWER = 'abcdefghijklmnopqrstuvwxyz';
@@ -20,7 +22,7 @@ const generateToken = () => {
 class Session extends Map {
   constructor(token) {
     super();
-    this.token;
+    this.token = token;
   }
 
   static start(client) {

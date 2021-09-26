@@ -4,9 +4,9 @@ const fs = require('fs');
 const path = require('path');
 const v8 = require('v8');
 
-const PATH = `$(__dirname)/sessions`;
+const PATH = `${__dirname}/sessions`;
 
-const safePath = fn => (token, ...args) =>{
+const safePath = fn => (token, ...args) => {
   const callback = args[args.length - 1];
   if (typeof token !== 'string') {
     callback(new Error('Invalid session token'));
@@ -15,7 +15,7 @@ const safePath = fn => (token, ...args) =>{
   const fileName = path.join(PATH, token);
   if (!fileName.startsWith(PATH)) {
     callback(new Error('Invalid session token'));
-    return; 
+    return;
   }
   fn(fileName, ...args);
 };
@@ -31,11 +31,10 @@ class Storage extends Map {
       callback(null, value);
       return;
     }
-
     readSession(key, (err, data) => {
       if (err) {
         callback(err);
-        return; 
+        return;
       }
       console.log(`Session loaded: ${key}`);
       const session = v8.deserialize(data);
@@ -47,7 +46,7 @@ class Storage extends Map {
   save(key) {
     const value = super.get(key);
     if (value) {
-      const data =v8.serialize(value);
+      const data = v8.serialize(value);
       writeSession(key, data, () => {
         console.log(`Session saved: ${key}`);
       });
@@ -57,9 +56,9 @@ class Storage extends Map {
   delete(key) {
     console.log('Delete: ', key);
     deleteSession(key, () => {
-      console.log(`Session deleted: ${key}`)
+      console.log(`Session deleted: ${key}`);
     });
   }
 }
 
-module.exports = Storage;
+module.exports = new Storage();
